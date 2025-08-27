@@ -221,7 +221,7 @@ async function handleEndShift(reconciliationData) {
             await api.saveDailyExpense(deficitExpense);
         }
         await api.saveShift(shiftData);
-        await api.exportShiftToPDF(shiftData);
+        await window.api.exportShiftToPDF(shiftData);
 
         ui.closeReconciliationModal();
         ui.closeShiftCalculationModal();
@@ -485,7 +485,7 @@ async function completeSale() {
         }
         api.cartSession.save();
         await api.saveData();
-        await api.printReceipt(newSale.id);
+        await window.api.printReceipt(newSale.id);
     } catch (error) {
         console.error("Error completing sale:", error);
         utils.showNotification("An error occurred while completing the sale.", "error");
@@ -2042,7 +2042,7 @@ export function setupEventListeners() {
             e.preventDefault();
             const password = document.getElementById('admin-password-input').value;
 
-            const result = await api.validateAdminPassword(password);
+            const result = await window.api.validateAdminPassword(password);
 
             if (result.success) {
                 state.isAdminMode = true;
@@ -2401,7 +2401,7 @@ export function setupEventListeners() {
         if (e.key === 'F1') {
             e.preventDefault();
             if (state.isAdminMode) {
-                api.openUsersWindow();
+                window.api.openUsersWindow();
             } else {
                 ui.showAdminPasswordModal();
             }
@@ -2425,7 +2425,7 @@ export function setupEventListeners() {
             if (state.currentPage === 'history-page') {
                 if (state.selectedSales.size === 1) {
                     const saleIdToPrint = state.selectedSales.values().next().value;
-                    api.printReceipt(saleIdToPrint);
+                    window.api.printReceipt(saleIdToPrint);
                 } else if (state.selectedSales.size > 1) {
                     utils.showNotification("Please select only one receipt to print.", "info");
                 } else {
@@ -2475,7 +2475,7 @@ export function setupEventListeners() {
         if (logoutBtn) {
             logoutBtn.classList.add('closing');
             setTimeout(() => {
-                api.logout();
+                window.api.logout();
             }, 300);
         }
     });
@@ -2484,9 +2484,9 @@ export function setupEventListeners() {
         const target = e.target;
         const closest = (selector) => target.closest(selector);
 
-        if (closest('#export-pdf-btn')) await api.exportReportToPDF();
-        if (closest('#export-returns-pdf-btn')) await api.exportReturnsToPDF();
-        if (closest('#export-inventory-btn')) await api.exportInventoryToPDF();
+        if (closest('#export-pdf-btn')) await window.api.exportReportToPDF();
+        if (closest('#export-returns-pdf-btn')) await window.api.exportReturnsToPDF();
+        if (closest('#export-inventory-btn')) await window.api.exportInventoryToPDF();
 
         if (target.id === 'add-daily-expense-btn') ui.showDailyExpenseModal();
         if (target.id === 'calculate-shift-btn') {
@@ -2521,10 +2521,10 @@ export function setupEventListeners() {
         if (target.id === 'cancel-shift-calculation-btn') ui.closeShiftCalculationModal();
         if (target.id === 'cancel-reconciliation-btn') ui.closeReconciliationModal();
 
-        if (target.id === 'open-users-window-btn') api.openUsersWindow();
+        if (target.id === 'open-users-window-btn') window.api.openUsersWindow();
         if (target.id === 'cancel-admin-password-btn') ui.closeAdminPasswordModal();
-        if (target.id === 'export-customers-btn') api.exportCustomersToExcel();
-        if (target.id === 'export-salaries-btn') api.exportSalariesToExcel();
+        if (target.id === 'export-customers-btn') window.api.exportCustomersToExcel();
+        if (target.id === 'export-salaries-btn') window.api.exportSalariesToExcel();
 
         if (closest('.product-row')) {
             const row = closest('.product-row');
@@ -2594,7 +2594,7 @@ export function setupEventListeners() {
         if (target.id === 'backup-db-btn') {
             utils.showLoader();
             try {
-                const result = await api.backupDatabase();
+                const result = await window.api.backupDatabase();
                 if (result.success) {
                     utils.showNotification(`${translations[state.lang].backupSuccess} ${result.path}`, 'success');
                 } else if (result.message && result.message !== 'Backup cancelled.') {
@@ -2611,7 +2611,7 @@ export function setupEventListeners() {
             if (confirm("Are you sure you want to restore the database? This will overwrite all current data and restart the application.")) {
                 utils.showLoader();
                 try {
-                    const result = await api.restoreDatabase();
+                    const result = await window.api.restoreDatabase();
                     if (result.success) {
                         utils.showNotification(translations[state.lang].restoreSuccess, 'success');
                     } else if (result.message && result.message !== 'Restore cancelled.') {
@@ -2675,7 +2675,7 @@ export function setupEventListeners() {
             const product = state.products.find(p => p.id === productId);
             if (product && product.colors[color] && product.colors[color].sizes[size]) {
                 const barcode = product.colors[color].sizes[size].barcode;
-                api.printBarcode(barcode, product.name, color, size, product.sellingPrice);
+                window.api.printBarcode(barcode, product.name, color, size, product.sellingPrice);
             }
         }
         if (target.classList.contains('category-tab')) {
@@ -2747,7 +2747,7 @@ export function setupEventListeners() {
         if (target.classList.contains('complete-sale-btn')) await completeSale();
         if (target.classList.contains('complete-sale-from-booking-btn')) await completeSaleFromBooking(target.dataset.bookingId);
         if (target.matches('.return-sale-btn')) ui.showReturnModal(target.dataset.saleId);
-        if (target.matches('.print-receipt-btn')) await api.printReceipt(target.dataset.saleId);
+        if (target.matches('.print-receipt-btn')) await window.api.printReceipt(target.dataset.saleId);
         if (target.id === 'delete-selected-btn') await deleteSelectedSales();
         if (target.id === 'cancel-return-btn') ui.closeReturnModal();
         if (target.id === 'confirm-return-btn') ui.showReturnTypeModal();
@@ -2770,7 +2770,7 @@ export function setupEventListeners() {
                 utils.showNotification("Cart is empty.", "info");
             }
         }
-        if (target.classList.contains('print-booking-btn')) await api.printBooking(target.dataset.bookingId);
+        if (target.classList.contains('print-booking-btn')) await window.api.printBooking(target.dataset.bookingId);
         if (closest('.edit-booking-btn')) ui.showEditBookingModal(closest('.edit-booking-btn').dataset.bookingId);
         if (closest('.edit-customer-btn')) {
             const customer = state.customers.find(c => c.id === closest('.edit-customer-btn').dataset.id);
@@ -2829,7 +2829,7 @@ export function setupEventListeners() {
 
         if (closest('.print-daily-shipment-btn')) {
             const btn = closest('.print-daily-shipment-btn');
-            api.printShipmentInvoice(state.activeSupplierId, btn.dataset.date);
+            window.api.printShipmentInvoice(state.activeSupplierId, btn.dataset.date);
         }
 
         if (closest('.edit-daily-shipment-btn')) {

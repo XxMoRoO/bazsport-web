@@ -17,7 +17,7 @@ import { ref, uploadString, getDownloadURL } from "https://www.gstatic.com/fireb
 // --- عمليات البيانات الأساسية ---
 
 /**
- * [إضافة جديدة] دالة للتحقق من كلمة سر الأدمن.
+ * دالة للتحقق من كلمة سر الأدمن.
  */
 export async function validateAdminPassword(password) {
     try {
@@ -33,7 +33,6 @@ export async function validateAdminPassword(password) {
         return { success: false, message: 'An error occurred.' };
     }
 }
-
 
 /**
  * تحميل جميع البيانات الأولية من Firestore.
@@ -123,10 +122,6 @@ export async function saveData() {
     }
 }
 
-// ... بقية الدوال تبقى كما هي ...
-
-
-
 // --- دوال اليوميات والمصاريف ---
 export async function saveDailyExpense(expenseData) {
     try {
@@ -211,7 +206,6 @@ export async function saveNewInvoice(invoiceData) {
 
         await runTransaction(db, async (transaction) => {
             for (const item of items) {
-                // If it's a new product, it must be created first in the transaction
                 if (item.isNew) {
                     const newProductRef = doc(db, 'products', item.productData.id);
                     transaction.set(newProductRef, item.productData);
@@ -220,7 +214,6 @@ export async function saveNewInvoice(invoiceData) {
                 const productRef = doc(db, 'products', item.productId);
                 const productDoc = await transaction.get(productRef);
 
-                // If the product doesn't exist yet (because it's new in this transaction), use the data we have
                 const productData = productDoc.exists() ? productDoc.data() : item.productData;
                 if (!productData) throw new Error(`Product data for ${item.productId} not found.`);
 
@@ -543,16 +536,103 @@ export async function printShipmentInvoice(supplierId, date) {
             return;
         }
         const supplier = state.suppliers.find(s => s.id === supplierId);
-        // ... (Full HTML generation logic from original api.js)
-        const htmlContent = `...`; // The full HTML string
+        const supplierName = supplier ? supplier.name : 'Unknown Supplier';
+
+        const allItems = shipmentsOnDate.flatMap(s => s.items);
+        const grossCost = shipmentsOnDate.reduce((sum, s) => sum + s.totalCost, 0);
+        const shippingCost = shipmentsOnDate.reduce((sum, s) => sum + (s.shippingCost || 0), 0);
+
+        const defectsForInvoice = state.defects.filter(d => d.supplierId === supplierId && d.shipmentDate === date);
+        const defectsValue = defectsForInvoice.reduce((sum, d) => sum + (d.quantity * d.purchasePrice), 0);
+        const netCost = grossCost - defectsValue;
+        const finalTotal = netCost + shippingCost;
+
+        const itemsHtml = allItems.map(item => {
+            const product = state.products.find(p => p.id === item.productId);
+            const defectiveCountForItem = defectsForInvoice
+                .filter(d => d.productId === item.productId && d.color === item.color && d.size === item.size)
+                .reduce((sum, d) => sum + d.quantity, 0);
+
+            const quantityDisplay = defectiveCountForItem > 0
+                ? `${item.quantity} <span style="color: #C97C7C; font-style: italic;">(${defectiveCountForItem} defective)</span>`
+                : item.quantity;
+
+            return `
+                <tr>
+                    <td>${product ? product.name : 'Unknown'} (${item.color}/${item.size})</td>
+                    <td>${quantityDisplay}</td>
+                    <td>${item.purchasePrice.toFixed(2)}</td>
+                    <td>${(item.quantity * item.purchasePrice).toFixed(2)}</td>
+                </tr>
+            `;
+        }).join('');
+
+        const defectsHtml = defectsForInvoice.map(defect => `
+            <tr class="defective-row">
+                <td>${defect.productName} (${defect.color}/${defect.size}) - ${defect.reason}</td>
+                <td>${defect.quantity}</td>
+                <td>${defect.purchasePrice.toFixed(2)}</td>
+                <td>${(defect.quantity * defect.purchasePrice).toFixed(2)}</td>
+            </tr>
+        `).join('');
+
+        const defectsSection = defectsForInvoice.length > 0 ? `
+            <h2 style="color: #C97C7C;">Defective Items Details</h2>
+            <table>
+                <thead>
+                    <tr><th>Product & Reason</th><th>Quantity</th><th>Unit Cost</th><th>Total Cost</th></tr>
+                </thead>
+                <tbody>${defectsHtml}</tbody>
+            </table>
+        ` : '';
+
+        const template = `
+            <html>
+                <head>
+                    <title>Shipment Invoice for ${new Date(date).toLocaleDateString()}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        h1, h2 { text-align: center; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        th { background-color: #f2f2f2; }
+                        .summary { text-align: right; margin-top: 20px; font-size: 1.2em; border-top: 2px solid #333; padding-top: 10px; }
+                        .summary p { margin: 5px 0; }
+                        .defective-row { color: #C97C7C; font-weight: bold; }
+                    </style>
+                </head>
+                <body>
+                    <h1>Shipment Invoice</h1>
+                    <p><strong>Date:</strong> ${new Date(date).toLocaleDateString()}</p>
+                    <p><strong>Supplier:</strong> ${supplierName}</p>
+                    <h2>Received Items</h2>
+                    <table>
+                        <thead>
+                            <tr><th>Product</th><th>Quantity</th><th>Unit Cost (EGP)</th><th>Total Cost (EGP)</th></tr>
+                        </thead>
+                        <tbody>${itemsHtml}</tbody>
+                    </table>
+                    ${defectsSection}
+                    <div class="summary">
+                        <p><strong>Gross Cost:</strong> ${grossCost.toFixed(2)} EGP</p>
+                        ${defectsValue > 0 ? `<p><strong>Defects Value:</strong> <span style="color: #C97C7C;">-${defectsValue.toFixed(2)} EGP</span></p>` : ''}
+                        <p><strong>Net Cost:</strong> ${netCost.toFixed(2)} EGP</p>
+                        <p><strong>Shipping Cost:</strong> ${shippingCost.toFixed(2)} EGP</p>
+                        <p><strong>Final Total: ${finalTotal.toFixed(2)} EGP</strong></p>
+                    </div>
+                </body>
+            </html>
+        `;
+
         const printWindow = window.open('', 'PRINT', 'height=800,width=600');
-        printWindow.document.write(htmlContent);
+        printWindow.document.write(template);
         printWindow.document.close();
         setTimeout(() => {
             printWindow.focus();
             printWindow.print();
             setTimeout(() => printWindow.close(), 1000);
         }, 500);
+
     } catch (error) {
         console.error("Error printing shipment invoice:", error);
         showNotification("An error occurred while printing.", "error");
@@ -596,6 +676,26 @@ export async function exportShiftToPDF(shift) {
                 head: [['ID', 'Time', 'Cashier', 'Method', 'Amount']],
                 body: shift.sales.map(s => [s.id, new Date(s.createdAt).toLocaleTimeString(), s.cashier, s.paymentMethod, s.totalAmount.toFixed(2)]),
                 theme: 'grid', headStyles: { fillColor: [22, 160, 133] }
+            });
+        }
+
+        if (shift.returns.length > 0) {
+            doc.autoTable({
+                startY: doc.lastAutoTable.finalY + 10,
+                head: [['Original ID', 'Time', 'Cashier', 'Amount']],
+                body: shift.returns.map(r => [r.originalSaleId, new Date(r.returnedAt).toLocaleTimeString(), r.cashier, r.returnValue.toFixed(2)]),
+                theme: 'grid',
+                headStyles: { fillColor: [231, 76, 60] }
+            });
+        }
+
+        if (shift.expenses.length > 0) {
+            doc.autoTable({
+                startY: doc.lastAutoTable.finalY + 10,
+                head: [['Time', 'Amount', 'Notes']],
+                body: shift.expenses.map(e => [new Date(e.date).toLocaleTimeString(), e.amount.toFixed(2), e.notes]),
+                theme: 'grid',
+                headStyles: { fillColor: [243, 156, 18] }
             });
         }
 
