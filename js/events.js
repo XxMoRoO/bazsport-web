@@ -2038,20 +2038,6 @@ export function setupEventListeners() {
             const deposit = parseFloat(document.getElementById('booking-deposit-input').value) || 0;
             saveReceiptAsBooking(state.activeReceiptId, deposit);
         }
-        if (e.target.id === 'admin-password-form') {
-            e.preventDefault();
-            const password = document.getElementById('admin-password-input').value;
-
-            const result = await window.api.validateAdminPassword(password);
-
-            if (result.success) {
-                state.isAdminMode = true;
-                ui.closeAdminPasswordModal();
-                ui.render();
-            } else {
-                document.getElementById('admin-password-error').classList.remove('hidden');
-            }
-        }
         if (e.target.id === 'edit-booking-form') await handleEditBookingSubmit(e);
         if (e.target.id === 'free-delivery-cost-form') {
             e.preventDefault();
@@ -2452,14 +2438,7 @@ export function setupEventListeners() {
     document.querySelector('header').addEventListener('click', (e) => {
         const navLink = e.target.closest('.nav-link');
         if (navLink) {
-            if (navLink.id === 'admin-mode-btn') {
-                if (state.isAdminMode) {
-                    state.isAdminMode = false;
-                    ui.render();
-                } else {
-                    ui.showAdminPasswordModal();
-                }
-            } else if (navLink.id === 'lang-switcher') {
+            if (navLink.id === 'lang-switcher') {
                 state.lang = state.lang === 'en' ? 'ar' : 'en';
                 ui.render();
             } else {
@@ -2473,10 +2452,8 @@ export function setupEventListeners() {
         }
         const logoutBtn = e.target.closest('#logout-btn');
         if (logoutBtn) {
-            logoutBtn.classList.add('closing');
-            setTimeout(() => {
-                window.api.logout();
-            }, 300);
+            sessionStorage.removeItem('loggedInUser');
+            window.location.href = 'login.html';
         }
     });
 
@@ -2522,7 +2499,6 @@ export function setupEventListeners() {
         if (target.id === 'cancel-reconciliation-btn') ui.closeReconciliationModal();
 
         if (target.id === 'open-users-window-btn') window.api.openUsersWindow();
-        if (target.id === 'cancel-admin-password-btn') ui.closeAdminPasswordModal();
         if (target.id === 'export-customers-btn') window.api.exportCustomersToExcel();
         if (target.id === 'export-salaries-btn') window.api.exportSalariesToExcel();
 

@@ -14,13 +14,11 @@ export let state = {
     salariesPaidStatus: {},
     expenses: {
         rent: { amount: 0, paidStatus: {} },
-        // [--- إضافة ---] مصفوفة لتخزين المصاريف اليومية
         daily: [],
     },
-    // [--- إضافة ---] مصفوفة لتخزين اليوميات المنتهية
     shifts: [],
-    shiftDateFilter: '', // [--- إضافة ---]
-    editingExpenseId: null, // [--- إضافة ---]
+    shiftDateFilter: '',
+    editingExpenseId: null,
     bookingSearchTerm: '',
     salariesSearchTerm: '',
     selectedSalariesMonth: '',
@@ -34,12 +32,11 @@ export let state = {
     sales: [],
     users: [],
     customers: [],
-    lang: 'en', // Set default language to English
+    lang: 'en',
     editingProductId: null,
     returningSaleId: null,
     selectedSales: new Set(),
-    currentUser: null,
-    isAdminMode: false,
+    currentUser: null, // سيتم تحديد المستخدم المسجل دخوله هنا
     categories: ['All'],
     activeCategory: 'All',
     itemToAdd: null,
@@ -65,29 +62,25 @@ export let state = {
         items: [],
         editingItemIndex: null,
     },
-    productModalSource: 'inventory', // لتتبع مصدر فتح نافذة المنتج
+    productModalSource: 'inventory',
     lowStockThreshold: 5,
     returnActionData: null,
     newProductFormData: null,
 };
 
-// [جديد] دالة لتحديث الحالة بأكملها عند التحميل الأولي
+// دالة لتحديث الحالة بأكملها عند التحميل الأولي
 export function setState(newState) {
-    // دمج البيانات الجديدة مع الحفاظ على بعض الحالات المحلية
     const preservedState = {
         currentPage: state.currentPage,
         activeReceiptId: state.activeReceiptId,
         lang: state.lang,
-        // أضف أي متغيرات أخرى تريد الحفاظ عليها هنا
     };
     state = { ...state, ...newState, ...preservedState };
 }
 
-
 // كائن الترجمة لجميع النصوص في التطبيق
 export const translations = {
     en: {
-        // [--- إضافة ---] نصوص جديدة لصفحة الإعدادات والنسخ الاحتياطي
         navSettings: 'Settings',
         settingsTitle: 'Application Settings',
         backupAndRestore: 'Backup & Restore',
@@ -97,7 +90,6 @@ export const translations = {
         backupError: 'Backup failed:',
         restoreSuccess: 'Database restored successfully. The application will now restart.',
         restoreError: 'Restore failed:',
-        // [--- إضافة ---] نصوص جديدة لليوميات
         navShifts: 'Shifts',
         addDailyExpense: 'Add Daily Expense',
         calculateCurrentShift: 'Calculate Current Shift',
@@ -124,7 +116,6 @@ export const translations = {
         endedBy: 'Ended By',
         reopenShift: 'Re-open Shift',
         confirmReopenShift: 'Are you sure you want to re-open this shift? The current open shift will be discarded.',
-        // --- النصوص الحالية ---
         navHome: 'Home', navInventory: 'Inventory', navSelling: 'Selling', navBooking: 'Booking', navHistory: 'History', navCustomers: 'Customers', navSalaries: 'Salaries', navAbout: 'About', btnLogout: 'Logout', navBestSellers: 'Best Sellers', navDefects: 'Defects', navSuppliers: 'Suppliers',
         searchPlaceholder: 'Search by name, code, or barcode...',
         inventorySearchPlaceholder: 'Search inventory...',
@@ -165,7 +156,6 @@ export const translations = {
         inventoryReportTitle: 'Inventory Report',
         colSoldThisMonth: 'Sold (Month)',
         colTotalSalesMonth: 'Total Sales (Month)',
-        navAdminMode: 'Admin',
         calculateShift: 'Calculate Shift',
         shiftReportTitle: 'Shift Report',
         saveAsBooking: 'Save as Booking',
@@ -323,6 +313,7 @@ export const translations = {
     },
     ar: {
         // ... (Arabic translations)
+
         // [--- إضافة ---] نصوص جديدة لصفحة الإعدادات والنسخ الاحتياطي
         navSettings: 'الإعدادات',
         settingsTitle: 'إعدادات التطبيق',

@@ -7,10 +7,21 @@ import { state, translations } from './state.js';
 import { getProductTotalQuantity, getCurrentDateAsYYYYMMDD } from './utils.js';
 
 // --- دوال عرض وتحديث الواجهة الرسومية ---
-export function updateAdminUI() {
-    document.body.classList.toggle('admin-mode', state.isAdminMode);
-    if (!state.isAdminMode && (state.currentPage === 'inventory-page' || state.currentPage === 'history-page' || state.currentPage === 'customers-page' || state.currentPage === 'salaries-page' || state.currentPage === 'best-sellers-page' || state.currentPage === 'defects-page' || state.currentPage === 'suppliers-page' || state.currentPage === 'shifts-page')) {
+
+/**
+ * [تعديل] هذه الدالة الآن تتحقق من اسم المستخدم بدلاً من متغير منفصل.
+ * تقوم بإظهار أو إخفاء عناصر الأدمن بناءً على ما إذا كان المستخدم الحالي هو "BAZ".
+ */
+export function updateAdminVisibility() {
+    const isAdmin = state.currentUser && state.currentUser.username === 'BAZ';
+    document.body.classList.toggle('admin-mode', isAdmin);
+
+    // إذا لم يكن المستخدم هو الأدمن وكان في صفحة خاصة بالأدمن، يتم إرجاعه للصفحة الرئيسية
+    const adminPages = ['inventory-page', 'history-page', 'customers-page', 'salaries-page', 'best-sellers-page', 'defects-page', 'suppliers-page', 'shifts-page', 'settings-page'];
+    if (!isAdmin && adminPages.includes(state.currentPage)) {
         state.currentPage = 'home-page';
+        // استدعاء render() مرة أخرى لضمان عرض الصفحة الرئيسية
+        render();
     }
 }
 
@@ -34,7 +45,8 @@ export function updateUIText() {
 }
 
 export function render() {
-    updateAdminUI();
+    // [تعديل] استدعاء الدالة الجديدة
+    updateAdminVisibility();
 
     document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
     const currentPageElement = document.getElementById(state.currentPage);
@@ -1133,26 +1145,6 @@ export function generateReport() {
 }
 
 // --- MODAL FUNCTIONS ---
-
-export function showAdminPasswordModal() {
-    const modal = document.getElementById('admin-password-modal');
-    if (modal) {
-        modal.classList.remove('hidden');
-        const input = modal.querySelector('#admin-password-input');
-        if (input) {
-            input.value = '';
-            input.focus();
-        }
-        document.getElementById('admin-password-error').classList.add('hidden');
-    }
-}
-
-export function closeAdminPasswordModal() {
-    const modal = document.getElementById('admin-password-modal');
-    if (modal) {
-        modal.classList.add('hidden');
-    }
-}
 
 export function showProductModal(product = null) {
     state.editingProductId = product ? product.id : null;

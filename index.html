@@ -12,7 +12,7 @@
     <script src="libs/jspdf.plugin.autotable.min.js"></script>
     <script src="libs/xlsx.full.min.js"></script>
 
-    <!-- [إضافة] استدعاء مكتبات Firebase للويب -->
+    <!-- Firebase Libraries -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js" type="module"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js" type="module"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js" type="module"></script>
@@ -582,8 +582,7 @@
     <header class="p-4 flex justify-between items-center sticky top-0 z-40">
         <div class="flex-1 flex justify-start">
             <div id="home-btn" class="flex items-center space-x-3 cursor-pointer">
-                <!-- [تعديل] تم تعديل مسار الصورة -->
-                <img id="header-logo" src="build\logo.png" alt="Baz Sport Logo" class="h-11 w-11">
+                <img id="header-logo" src="logo.png" alt="Baz Sport Logo" class="h-11 w-11">
                 <span class="text-2xl font-bold" style="color: var(--primary-text);">Baz Sport</span>
             </div>
         </div>
@@ -678,7 +677,6 @@
                 <span class="nav-text-label" data-lang-key="navSuppliers">Suppliers</span>
             </button>
 
-            <!-- [--- تعديل ---] تم تغيير ترتيب الأزرار -->
             <button id="nav-shifts" class="nav-link admin-only" data-page="shifts-page" title="Shifts">
                 <div class="icon-wrapper">
                     <svg class="icon" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -697,19 +695,9 @@
                 </div>
                 <span class="nav-text-label" data-lang-key="navHistory">History</span>
             </button>
-
-            <button id="admin-mode-btn" class="nav-link">
-                <div class="icon-wrapper">
-                    <svg class="icon" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
-                    </svg>
-                </div>
-                <span class="nav-text-label" data-lang-key="navAdminMode">Admin</span>
-            </button>
         </nav>
 
         <div class="flex-1 flex justify-end items-center space-x-2">
-            <!-- [--- إضافة ---] زر الإعدادات الجديد -->
             <button id="nav-settings" class="nav-link admin-only" data-page="settings-page" title="Settings">
                 <div class="icon-wrapper">
                     <svg class="icon" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -807,7 +795,7 @@
             <div id="open-bookings-list" class="space-y-4"></div>
         </div>
 
-        <!-- [--- تعديل ---] تم تحديث هيكل صفحة اليوميات -->
+        <!-- Shifts Page -->
         <div id="shifts-page" class="page hidden">
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-3xl font-bold" data-lang-key="navShifts">Shifts</h1>
@@ -821,7 +809,6 @@
             <div>
                 <h2 class="text-2xl font-bold mb-4" data-lang-key="shiftHistory">Shift History</h2>
                 <div id="shift-history-container" class="space-y-4">
-                    <!-- Shift history will be rendered here by ui.js -->
                 </div>
             </div>
         </div>
@@ -928,7 +915,6 @@
                         </select>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <!-- [--- تعديل ---] تم تغيير أيقونة تصدير المبيعات وتنسيقها -->
                         <button id="export-pdf-btn" class="btn-icon btn-icon-green" title="Export Sales to PDF"
                             data-lang-key="exportPdf">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -936,7 +922,6 @@
                                     d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM12 18c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm-1-4h2v-1h-1c-.55 0-1-.45-1-1s.45-1 1-1h1v-1h-2v1h1c.55 0 1 .45 1 1s-.45 1-1 1h-1v1z" />
                             </svg>
                         </button>
-                        <!-- [--- تعديل ---] تم تغيير أيقونة تصدير المرتجعات وتنسيقها -->
                         <button id="export-returns-pdf-btn" class="btn-icon btn-icon-yellow"
                             title="Export Returns to PDF" data-lang-key="exportReturns">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -949,7 +934,6 @@
 
                 <div id="report-summary"
                     class="mt-6 border-t border-gray-700 pt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    <!-- Summary content will be rendered here -->
                 </div>
             </div>
             <div class="flex justify-between items-center mb-4">
@@ -1048,13 +1032,11 @@
 
         <!-- Suppliers Page -->
         <div id="suppliers-page" class="page hidden">
-            <!-- Content will be rendered by JS -->
         </div>
 
-        <!-- [--- إضافة ---] صفحة الإعدادات الجديدة -->
+        <!-- Settings Page -->
         <div id="settings-page" class="page hidden">
             <h1 class="text-3xl font-bold mb-6" data-lang-key="settingsTitle">Application Settings</h1>
-
             <div class="bg-secondary-bg p-6 rounded-lg shadow">
                 <h2 class="text-2xl font-bold mb-4" data-lang-key="backupAndRestore">Backup & Restore</h2>
                 <div class="flex items-center space-x-4">
@@ -1065,7 +1047,6 @@
                 </div>
             </div>
         </div>
-
     </main>
 
     <!-- Modals -->
@@ -1091,21 +1072,6 @@
                 <button id="cancel-return-btn" class="btn-secondary py-2 px-4 rounded-lg">Cancel</button>
                 <button id="confirm-return-btn" class="btn-primary py-2 px-4 rounded-lg">Confirm Return</button>
             </div>
-        </div>
-    </div>
-    <div id="admin-password-modal" class="modal fixed inset-0 z-50 flex items-center justify-center hidden">
-        <div class="modal-content w-full max-w-sm p-6 rounded-lg shadow-lg">
-            <h2 class="text-2xl font-bold mb-4">Admin Login</h2>
-            <form id="admin-password-form">
-                <label for="admin-password-input" class="block mb-2">Password</label>
-                <input type="password" id="admin-password-input" class="w-full p-2 rounded-lg mb-2" required>
-                <p id="admin-password-error" class="text-red-500 text-sm mb-4 hidden">Incorrect password.</p>
-                <div class="flex justify-end space-x-4 mt-4">
-                    <button type="button" id="cancel-admin-password-btn"
-                        class="btn-secondary py-2 px-4 rounded-lg">Cancel</button>
-                    <button type="submit" class="btn-primary py-2 px-4 rounded-lg">Login</button>
-                </div>
-            </form>
         </div>
     </div>
     <div id="booking-confirmation-modal" class="modal fixed inset-0 z-50 flex items-center justify-center hidden">
@@ -1201,8 +1167,6 @@
             </form>
         </div>
     </div>
-
-    <!-- Stock Reduction and Defects Modals -->
     <div id="stock-reduction-confirm-modal" class="modal fixed inset-0 z-50 flex items-center justify-center hidden">
         <div class="modal-content w-full max-w-lg p-6 rounded-lg shadow-lg">
             <h2 class="text-2xl font-bold mb-4" data-lang-key="stockAdjustConfirmTitle">Stock Adjustment Confirmation
@@ -1242,7 +1206,6 @@
             </form>
         </div>
     </div>
-
     <div id="return-type-modal" class="modal fixed inset-0 z-50 flex items-center justify-center hidden">
         <div class="modal-content w-full max-w-sm p-6 rounded-lg shadow-lg">
             <h2 class="text-2xl font-bold mb-4" data-lang-key="returnTypeTitle">Return Type</h2>
@@ -1257,7 +1220,6 @@
             </div>
         </div>
     </div>
-
     <div id="free-delivery-cost-modal" class="modal fixed inset-0 z-50 flex items-center justify-center hidden">
         <div class="modal-content w-full max-w-sm p-6 rounded-lg shadow-lg">
             <h2 class="text-2xl font-bold mb-4" data-lang-key="freeDelivery">Free Delivery</h2>
@@ -1274,7 +1236,6 @@
             </form>
         </div>
     </div>
-
     <!-- Supplier Modals -->
     <div id="supplier-modal" class="modal fixed inset-0 z-50 flex items-center justify-center hidden"></div>
     <div id="select-supplier-modal" class="modal fixed inset-0 z-50 flex items-center justify-center hidden"></div>
@@ -1282,18 +1243,12 @@
     <div id="supplier-defect-modal" class="modal fixed inset-0 z-50 flex items-center justify-center hidden"></div>
     <div id="supplier-return-modal" class="modal fixed inset-0 z-50 flex items-center justify-center hidden"></div>
     <div id="shipment-item-modal" class="modal fixed inset-0 z-50 flex items-center justify-center hidden"></div>
-
-    <!-- [--- إضافة ---] نافذة إنشاء فاتورة المورد الجديدة -->
     <div id="invoice-builder-modal" class="modal fixed inset-0 z-50 flex items-center justify-center hidden">
-        <div class="modal-content modal-content-scrollable w-full max-w-4xl p-6 rounded-lg shadow-lg my-8">
-            <!-- المحتوى سيتم إضافته هنا لاحقاً بواسطة ui.js -->
-        </div>
+        <div class="modal-content modal-content-scrollable w-full max-w-4xl p-6 rounded-lg shadow-lg my-8"></div>
     </div>
-
-    <!-- [--- إضافة ---] نوافذ منبثقة جديدة لليوميات -->
+    <!-- Daily Expense & Shift Modals -->
     <div id="daily-expense-modal" class="modal fixed inset-0 z-50 flex items-center justify-center hidden"></div>
     <div id="edit-daily-expense-modal" class="modal fixed inset-0 z-50 flex items-center justify-center hidden"></div>
-    <!-- [--- إضافة ---] -->
     <div id="shift-calculation-modal" class="modal fixed inset-0 z-50 flex items-center justify-center hidden"></div>
     <div id="reconciliation-modal" class="modal fixed inset-0 z-50 flex items-center justify-center hidden"></div>
 
@@ -1301,7 +1256,6 @@
         <div class="loader-spinner"></div>
     </div>
 
-    <!-- [تعديل] تم تغيير مسار ملف renderer.js واستيراده كـ module -->
     <script src="js/renderer.js" type="module"></script>
 </body>
 
