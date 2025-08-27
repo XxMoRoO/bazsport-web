@@ -17,6 +17,25 @@ import { ref, uploadString, getDownloadURL } from "https://www.gstatic.com/fireb
 // --- عمليات البيانات الأساسية ---
 
 /**
+ * [إضافة جديدة] دالة للتحقق من كلمة سر الأدمن.
+ */
+export async function validateAdminPassword(password) {
+    try {
+        const configRef = doc(db, "app_config", "main");
+        const configDoc = await getDoc(configRef);
+        if (configDoc.exists() && configDoc.data().adminPassword === password) {
+            return { success: true };
+        } else {
+            return { success: false, message: 'Incorrect password.' };
+        }
+    } catch (error) {
+        console.error("Error validating admin password:", error);
+        return { success: false, message: 'An error occurred.' };
+    }
+}
+
+
+/**
  * تحميل جميع البيانات الأولية من Firestore.
  */
 export async function loadData() {
@@ -40,7 +59,6 @@ export async function loadData() {
             };
             data.lastShiftReportTime = configData.lastShiftReportTime;
         } else {
-            // حالة عدم وجود إعدادات (يمكن أن تحدث في أول تشغيل)
             data.config = {};
             data.categories = [];
             data.salaries = {};
@@ -63,7 +81,6 @@ export async function saveData() {
     try {
         const { products, sales, categories, customers, bookings, salaries, salariesPaidStatus, expenses, defects, suppliers, shipments, shifts, users } = state;
 
-        // حفظ الإعدادات
         const configRef = doc(db, "app_config", "main");
         const savedCategories = categories.filter(c => c !== 'All');
         batch.set(configRef, {
@@ -74,29 +91,22 @@ export async function saveData() {
             lastShiftReportTime: state.lastShiftReportTime
         }, { merge: true });
 
-        // حفظ المجموعات الأخرى
         const collections = { products, sales, customers, bookings, defects, suppliers, shipments, shifts, users, daily_expenses: expenses.daily };
         for (const [collName, collData] of Object.entries(collections)) {
             if (collData) {
-                // First, get all existing doc IDs from Firestore for this collection
                 const existingDocsSnapshot = await getDocs(collection(db, collName));
                 const existingIds = new Set(existingDocsSnapshot.docs.map(d => d.id));
 
-                // Process current state data
                 collData.forEach(item => {
-                    // Ensure item has an ID before trying to create a doc ref
                     if (item.id) {
                         const docRef = doc(db, collName, item.id);
                         batch.set(docRef, item);
-                        // Remove the ID from the set if it exists in the current state
                         existingIds.delete(item.id);
                     } else {
                         console.warn(`Item in collection ${collName} is missing an ID`, item);
                     }
                 });
 
-                // Any IDs left in the set are documents that were deleted from the state
-                // and should be deleted from Firestore
                 existingIds.forEach(idToDelete => {
                     batch.delete(doc(db, collName, idToDelete));
                 });
@@ -112,6 +122,9 @@ export async function saveData() {
         hideLoader();
     }
 }
+
+// ... بقية الدوال تبقى كما هي ...
+
 
 
 // --- دوال اليوميات والمصاريف ---

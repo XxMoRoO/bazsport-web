@@ -2041,7 +2041,9 @@ export function setupEventListeners() {
         if (e.target.id === 'admin-password-form') {
             e.preventDefault();
             const password = document.getElementById('admin-password-input').value;
+
             const result = await api.validateAdminPassword(password);
+
             if (result.success) {
                 state.isAdminMode = true;
                 ui.closeAdminPasswordModal();
